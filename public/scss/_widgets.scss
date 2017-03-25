@@ -1,0 +1,36 @@
+@mixin box-shadow($top, $left, $blur, $color, $inset:"") {
+	-webkit-box-shadow:$top $left $blur $color #{$inset};
+	-moz-box-shadow:$top $left $blur $color #{$inset};
+	box-shadow:$top $left $blur $color #{$inset};
+}
+
+
+.superexcitingannouncementbanner {
+	width: 100%;
+	background-color: #C1DDF0;
+	line-height: 30px;
+	padding: 15px 0;
+	z-index: 1000;
+
+	@include box-shadow(5px, 0, 10px, #ccc);
+
+	h2 {
+		text-align: left;
+		font-size: 16pt;
+	}
+	.banner-content {
+		padding: 0 60px 0 180px;
+	}
+
+	.prize {
+		float: left;
+		width: 160px;
+		position: absolute;
+		top: -2px;
+	}
+
+	p {
+		line-height: 1.3;
+	}
+	
+}

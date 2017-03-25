@@ -1,0 +1,13 @@
+/* CSS for the standalone version */
+
+html {
+	background-image: url('../images/bg_viz.png');
+}
+
+html,body {
+	overflow:hidden;
+}
+
+#mainCanvas {
+	height: 750px;
+}
