@@ -1,3 +1,5 @@
+# Animation Flow
+
 This is a demo that used to run on the engineering public website.
 
 Click on the dots!
