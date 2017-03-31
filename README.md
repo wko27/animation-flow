@@ -11,8 +11,3 @@ To run locally:
 
 Dependencies
 - sass (http://sass-lang.com/)
-
-Development
-1) If you're editing scss files, run `sass --watch scss/main.scss:css/main.css &` to compile css continually in the background.
-2) Edit the files in vim.
-3) Enjoy successful recruitment.
