@@ -1,2 +1,1 @@
 require('./public/js/standalone');
-
