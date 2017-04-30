@@ -802,11 +802,6 @@ function animate(config) {
 
 		return false;
 	}
-
-	// scroll down :)
-	function goOnReading () {
-		$('.fixedscroller-inner').scrollintoview({direction: "vertical"});
-	}
 	
 	/**
 	 * Display an image or text as given
@@ -839,7 +834,7 @@ function animate(config) {
 				}
 				i++;
 			}
-		}
+		};
 	}
 	
 	// Display the given text scrolling

@@ -108,7 +108,7 @@ function stretchScaler(xScale, yScale) {
 		}
 
 		return offsets;
-	}
+	};
 }
 
 /**
@@ -158,7 +158,7 @@ function getBounds(pixels) {
 		maxY : getY(_.max(pixels, getY)),
 		width : this.maxX - this.minX,
 		height : this.maxY - this.minY
-	}
+	};
 }
 
 var pixelLoader = {
