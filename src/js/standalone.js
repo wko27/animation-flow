@@ -48,7 +48,7 @@ $(function() {
 	viz.animate({
 		states : ['init', 'collect', 'analyze', 'clean', 'display', 'medallia', 'image'],
 		repeat : true,
-		image : "public/images/sthacktrix.jpg",
+		image : "images/sthacktrix.jpg",
 		initCallback : function(goToState) {
 			// Register visualization controls
 			$('.viz-control').bind('click', function(){
