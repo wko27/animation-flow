@@ -5,10 +5,7 @@ This is a demo that used to run on Medallia's engineering website.
 Click on the dots!
 
 To run locally:
-- npm install
-- npm run build
-- npm start
+- `npm install`
+- `npm run build && ( sleep 3 && open 'http://localhost:8080' & ) && npm start`
 
-Dependencies
-- sass (http://sass-lang.com/)
-- jquery
+Also, check out `localhost:8080/message.html`

@@ -1,15 +1,19 @@
-var viz = require('./js/viz');
-var blower = require('./js/util/blower');
+var viz = require('./viz');
+var blower = require('./util/blower');
 var $ = require('jquery');
 
-$(function() {
+function medallia(domElement, width, height) {
+  $(function() {
+	const canvas = document.createElement("canvas");
+	domElement.appendChild(canvas);
+	canvas.id = "mainCanvas";
+
 	var transitionHighlights = {
 		collect : "collect",
 		analyze : "analyze",
 		clean : "analyze",
 		display : "display"
 	};
-	var canvas = document.getElementById("mainCanvas");
 	var scale = 1.0;
 	viz.animate({
 		states : ['init', 'collect', 'analyze', 'clean', 'display', 'medallia', 'image'],
@@ -40,4 +44,30 @@ $(function() {
 		canvas : canvas,
 		scale: scale
 	});
-}); // dom ready
+  }); // dom ready
+}
+
+function message(domElement, width, height, messageText) {
+  $(function() {
+    const canvas = document.createElement("canvas");
+    domElement.appendChild(canvas);
+//    canvas.id = "mainCanvas";
+    canvas.width = width;
+    canvas.height = height;
+    
+    viz.animate({
+	states : ['message'],
+	repeat : true,
+	image : null,
+	// TODO: Read message in from a file/IM/email
+	message : messageText,
+	blowEnabled : true,
+	canvas : canvas
+    });
+  });
+}
+
+module.exports = {
+  medallia: medallia,
+  message: message
+};

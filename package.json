@@ -2,10 +2,10 @@
   "name": "animation-flow",
   "version": "0.0.1",
   "description": "Demo of animation flow.",
-  "main": "src/index.js",
+  "main": "src/viz.js",
   "scripts": {
-    "build": "npm run clean && mkdir -p dist && browserify src/index.js -o dist/main.js",
-    "watch": "npm run clean && mkdir -p dist && watchify src/index.js -o dist/main.js",
+    "build": "npm run clean && mkdir -p dist && browserify src/index.js --standalone viz -o dist/main.js",
+    "watch": "npm run clean && mkdir -p dist && watchify src/index.js --standalone viz -o dist/main.js",
     "clean": "rm -rf dist",
     "start": "nodemon server/index.js"
   },

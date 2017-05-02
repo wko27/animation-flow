@@ -1,0 +1,21 @@
+<html>
+<head>
+<!--
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" type="text/css" href="css/standalone.css">
+-->
+    <style>
+      body {
+        background-color: black;
+      }
+    </style>
+    <script src="dist/main.js"></script>
+<body>
+  <div id="viz">
+  </div>
+  <script>
+    var div = document.getElementById("viz");
+    window.viz.message(div, window.innerWidth, window.innerHeight, "This is a message");
+  </script>
+</body>
+</html>

@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="css/main.css">
     <link rel="stylesheet" type="text/css" href="css/standalone.css">
     <script src="dist/main.js"></script>
+</head>
 <body>
 <div id="viz">
     <div class="G viz-content">
@@ -29,7 +30,10 @@
             <strong>Display.</strong> Dynamic real-time visualizations enable our users to gain insights into their customers.
         </p>
     </div>
-    <canvas id="mainCanvas"></canvas>
 </div>
+<script>
+  var div = document.getElementById("viz");
+  window.viz.medallia(div, "100%", "750px");
+</script>
 </body>
 </html>
