@@ -6,7 +6,12 @@ function medallia(domElement, width, height) {
   $(function() {
 	const canvas = document.createElement("canvas");
 	domElement.appendChild(canvas);
-	canvas.id = "mainCanvas";
+	canvas.style.top = 0;
+	canvas.style.left = 0;
+	canvas.style.position = "absolute";
+
+	canvas.width = width;
+	canvas.height = height;
 
 	var transitionHighlights = {
 		collect : "collect",
@@ -51,7 +56,6 @@ function message(domElement, width, height, messageText) {
   $(function() {
     const canvas = document.createElement("canvas");
     domElement.appendChild(canvas);
-//    canvas.id = "mainCanvas";
     canvas.width = width;
     canvas.height = height;
     

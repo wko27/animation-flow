@@ -560,7 +560,7 @@ function animate(config) {
 	 * In particular, if you get an irregular loop, decrease the rotation speed
 	 * since most likely there are too few points (angles) representing the path
 	 */
-	function figureEight (centerX, centerY, radius, rotationSpeed, m, xStretch) {
+	function figureEight(centerX, centerY, radius, rotationSpeed, m, xStretch) {
 		var angle = norm2Input(m.count) + rotationSpeed * updateCount / 100;
 		m.targetX = centerX + xStretch * radius * sine(angle);
 		m.targetY = centerY + radius * sine(angle) * cosine(angle);
