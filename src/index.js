@@ -13,42 +13,53 @@ function medallia(domElement, width, height) {
 	canvas.width = width;
 	canvas.height = height;
 
-	var transitionHighlights = {
+	const transitionHighlights = {
 		collect : "collect",
 		analyze : "analyze",
 		clean : "analyze",
 		display : "display"
 	};
-	var scale = 1.0;
-	viz.animate({
-		states : ['init', 'collect', 'analyze', 'clean', 'display', 'medallia', 'image'],
-		repeat : true,
-		image : "images/sthacktrix.jpg",
-		initCallback : function(goToState) {
+	
+	function onImageLoad() {
+		animation.start();
+	}
+	
+	const animation = viz.animate({
+		states: [
+			viz.states.scatter(),
+			viz.states.nestedDiamonds(),
+			viz.states.circles(),
+			viz.states.circlesFigureEight(),
+			viz.states.display(),
+			viz.states.staticText("MEDALLIA"),
+			viz.states.image("images/sthacktrix.jpg")
+		],
+		repeat: true,
+		initCallback: function(goToState) {
 			// Register visualization controls
 			$('.viz-control').bind('click', function(){
 				var id = $(this).attr('id').split('-')[0];
 				goToState(id);
 			});
 		},
-		transitionOutCallback : function(oldStateId) {
+		transitionOutCallback: function(oldStateId) {
 			if (oldStateId in transitionHighlights) {
 				// Fade out the last explanation, and unhighlight the appropriate control
 				$('#' + oldStateId + '-explanation').fadeOut(100);
 				$('#' + transitionHighlights[oldStateId] + '-control').removeClass("viz-control-active");
 			}
 		},
-		transitionInCallback : function(newStateId) {
+		transitionInCallback: function(newStateId) {
 			if (newStateId in transitionHighlights) {
 				// Fade in the new explanation, and highlight the appropriate control
 				$('#' + newStateId + '-explanation').animate('opacity',150).fadeIn(500);
 				$('#' + transitionHighlights[newStateId] + '-control').addClass("viz-control-active");
 			}
 		},
-		blower : blower.getDefaultBlower(canvas, scale),
-		canvas : canvas,
-		scale: scale
+		blowEnabled: true,
+		canvas: canvas
 	});
+	animation.start();
   }); // dom ready
 }
 
@@ -59,15 +70,14 @@ function message(domElement, width, height, messageText) {
     canvas.width = width;
     canvas.height = height;
     
-    viz.animate({
-	states : ['message'],
-	repeat : true,
-	image : null,
-	// TODO: Read message in from a file/IM/email
-	message : messageText,
-	blowEnabled : true,
-	canvas : canvas
+    animation = viz.animate({
+      states : [viz.states.scrollingText(messageText)],
+      repeat : true,
+      blowEnabled : true,
+      canvas : canvas
     });
+    
+    animation.start();
   });
 }
 
