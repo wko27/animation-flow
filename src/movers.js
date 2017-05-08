@@ -148,9 +148,23 @@ function updatePosition(animationState, blower) {
 	}
 }
 
+/** Set the initial positions and colors of the movers */
+function initialize(animationState, numMovers) {
+	for (var i = 0; i < numMovers; i ++) {
+		var m = new Mover();
+		m.x = animationState.canvasW * 0.5;
+		m.y = animationState.canvasH * 0.5;
+		m.vX = Math.cos(i) * Math.random() * 34;
+		m.vY = Math.cos(i) * Math.random() * 34;
+		m.targetX = Math.random() * animationState.canvasW;
+		m.targetY = Math.random() * animationState.canvasH;
+		movers[i] = m;
+	}
+}
+
 module.exports = {
-	Mover: Mover,
 	movers: movers,
+	initialize: initialize,
 	resetColors: resetColors,
 	updatePosition: updatePosition,
 }

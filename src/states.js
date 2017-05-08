@@ -529,20 +529,14 @@ function scrollingText(msg) {
 			);
 }
 
-// Append the image if desired
+// Display the given Image object
+// It is advised to fully load the image before starting animations which use it
 function image(img, onload) {
 	if (!img) {
 		throw new Error("Must provide an image");
 	}
 	
-	// Register the image if desired
-	var image = new Image();
-	image.src = img;
-	if (onload) {
-		image.onload = onload;
-	}
-	
-	var imagePixelLoader = pixelLoader.registerImage(image, 300, 300);
+	var imagePixelLoader = pixelLoader.registerImage(img, 300, 300);
 	
 	// Display a static image
 	return new State('image', null,
@@ -558,7 +552,21 @@ function image(img, onload) {
 			);
 }
 
-module.exports = {
+/** Initialize the state transitions */
+function createTransitionMap(states, repeat) {
+	const nextState = {};
+	for (var i = 0; i < states.length - 1; i += 1) {
+		nextState[states[i].id] = states[i + 1];
+	}
+	
+	if (repeat) {
+		nextState[states[states.length - 1].id] = states[0];
+	}
+	
+	return nextState;
+}
+
+const examples = {
 	scatter: scatter,
 	nestedDiamonds: nestedDiamonds,
 	circles: circles,
@@ -566,5 +574,11 @@ module.exports = {
 	display: display,
 	image: image,
 	scrollingText: scrollingText,
-	staticText: staticText,
+	staticText: staticText
+}
+
+module.exports = {
+	State: State,
+	examples: examples,
+	createTransitionMap: createTransitionMap
 }

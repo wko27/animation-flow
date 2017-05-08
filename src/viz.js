@@ -14,6 +14,15 @@ const $ = require('jquery'),
 	colors = require('./colors');
 
 const defaultConfig = {
+	/** DOM element to attach a canvas */
+	domElement: null,
+	
+	/** Width of the canvas */
+	width: 0,
+	
+	/** Height of the canvas */
+	height: 0,
+	
 	/** States to display */
 	states: [],
 	
@@ -53,11 +62,6 @@ const defaultConfig = {
 	 */
 	blowEnabled: true,
 	
-	/**
-	 * Canvas object to manipulate
-	 */
-	canvas: null,
-	
 	/** Scale */
 	scale: 1.0
 };
@@ -92,13 +96,6 @@ function animate(config) {
 	};
 	
 	config = _.extend(defaultConfig, config);
-
-	/** Store the canvas and it's sizes */
-	var canvas = config.canvas;
-	
-	if (config.blowEnabled) {
-		config.blower = blower.getDefaultBlower(canvas, config.scale)
-	}
 	
 	/* Id returned by timeout function */
 	var stateTimeoutId;
@@ -106,22 +103,34 @@ function animate(config) {
 	/** Initialize the entire animation */
 	function init() {
 		$(function() {
-            canvas = config.canvas;
-             
-			// Initialize states
-			initStates();
+			const canvas = document.createElement("canvas");
+			config.canvas = canvas;
+			config.domElement.appendChild(canvas);
+			canvas.style.top = 0;
+			canvas.style.left = 0;
+			canvas.style.position = "absolute";
+
+			canvas.width = config.width;
+			canvas.height = config.height;
 			
-			// Resize the canvas to the scale
+			if (config.blowEnabled) {
+				config.blower = blower.getDefaultBlower(canvas, config.scale)
+			}
+            
+            // Resize the canvas to the scale
 			animationState.canvasW = canvas.offsetWidth / config.scale;
 			animationState.canvasH = canvas.offsetHeight / config.scale;
-			canvas.width = animationState.canvasW;
-			canvas.height = animationState.canvasH;	
-
+ 
+			// Initialize states
+			animationState.nextState = states.createTransitionMap(config.states, config.repeat);
+			
 			// Initialize the renderer
 			config.renderer = render.getRenderer(config.renderer, canvas);
 
+			setColors(colors.blueColors);
+			
 			// Initialize the movers
-			initMovers();
+			movers.initialize(animationState, config.renderer.numMovers);
 			
 			// Register the animation frame requests
 			initFrameRequest();
@@ -154,34 +163,6 @@ function animate(config) {
 		movers.resetColors();
 	}
 	
-	/** Set the initial positions of the movers (each dot) */
-	function initMovers(){
-		setColors(colors.blueColors);
-		
-		var i = config.renderer.numMovers;
-		while ( i-- ){
-			var m = new movers.Mover();
-			m.x   = animationState.canvasW * 0.5;
-			m.y   = animationState.canvasH * 0.5;
-			m.vX  = Math.cos(i) * Math.random() * 34;
-			m.vY  = Math.cos(i) * Math.random() * 34;
-			m.targetX = Math.random() * animationState.canvasW;
-			m.targetY = Math.random() * animationState.canvasH;
-			animationState.movers[i] = m;
-		}
-	}
-	
-	function initStates() {
-		animationState.nextState = new Map();
-		for (var i = 0; i < config.states.length - 1; i += 1) {
-			animationState.nextState[config.states[i].id] = config.states[i + 1];
-		}
-		
-		if (config.repeat) {
-			animationState.nextState[config.states[config.states.length - 1].id] = config.states[0];
-		}
-	}
-	
 	/** Function which moves the current state */
 	function transition() {
 		if (config.controller && config.controller.paused) {
@@ -199,8 +180,8 @@ function animate(config) {
 	/** Go to the given state */
 	function goToState(state) {
 		// Clear out any preset timeouts
-		clearTimeout(stateTimeoutId);
-		stateTimeoutId = null;
+		clearTimeout(animationState.stateTimeoutId);
+		animationState.stateTimeoutId = null;
 		
 		// Clean up from the last state, but only if there is a next state to go to
 		if (animationState.currentState) {
@@ -224,11 +205,16 @@ function animate(config) {
 		
 		// Set up the next state transition
 		if (animationState.currentState.transitionDelay) {
-			stateTimeoutId = setTimeout(transition, animationState.currentState.transitionDelay);
+			animationState.stateTimeoutId = setTimeout(transition, animationState.currentState.transitionDelay);
 		}
 	}
 
 	function updateState() {
+		if (animationState.stopCallback) {
+			config.domElement.removeChild(config.canvas);
+			return;
+		}
+		
 		animationState.updateDelta = Date.now() - animationState.stateStartTime;
 		animationState.updateCount = animationState.updateDelta / 100 - 6;
 //		console.log(updateCount + " " + (updateDelta / 100));
@@ -239,6 +225,10 @@ function animate(config) {
 			animationState.currentState.update(animationState);
 		}
 	}
+	
+	function stop(stopCallback) {
+		animationState.stopCallback = stopCallback || Function.prototype;
+	}
 		
 	return {
 		start: init,
@@ -248,5 +238,6 @@ function animate(config) {
 
 module.exports = {
 	animate: animate,
-	states: states
+	State: states.State,
+	examples: states.examples
 };
