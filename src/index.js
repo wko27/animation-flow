@@ -60,16 +60,13 @@ function medallia(domElement, width, height) {
 
 function message(domElement, width, height, messageText) {
   $(function() {
-    const canvas = document.createElement("canvas");
-    domElement.appendChild(canvas);
-    canvas.width = width;
-    canvas.height = height;
-    
     animation = viz.animate({
-      states : [viz.states.scrollingText(messageText)],
+      domElement: domElement,
+      width: width,
+      height: height,
+      states : [viz.examples.scrollingText(messageText)],
       repeat : true,
       blowEnabled : true,
-      canvas : canvas
     });
     
     animation.start();

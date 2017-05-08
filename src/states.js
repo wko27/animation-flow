@@ -395,8 +395,8 @@ function goDisplayScrollingText(pixelLoader, textScroller) {
 		var centerY = animationState.canvasH * 0.5;
 		
 		// How much the text should have shifted by in pixels
-		// Start with an extra 1/4 of the window so the first words have time to settle
-		var xShift = animationState.updateCount * scrollSpeed - scrollWidth / 4;
+		// Start with an extra 1/2 of the window so the first words have time to settle
+		var xShift = animationState.updateCount * scrollSpeed - scrollWidth / 2;
 		
 		// Find the start and end index we can use
 		var idxStart = 0;
@@ -425,8 +425,9 @@ function goDisplayScrollingText(pixelLoader, textScroller) {
 			var m = animationState.movers[i];
 			var idx = i;
 			
-			while (idx < idxStart)
+			while (idx < idxStart) {
 				idx += animationState.movers.length;
+			}
 			
 			if (idx > idxEnd) {
 				// Unused movers become a blue figure eight

@@ -70,19 +70,14 @@ const defaultConfig = {
  * @param config
  */
 function animate(config) {	
-	var animationState = {
+	// State of the animation (which can change over time)
+	const animationState = {
 		/** How many times the animation has started from the initial state */
 		animationCount: 0,
 		/** Time since the state began */
 		updateDelta: 0,
 		/* Delta since state started */
 		updateCount: 0,
-		/** Current state */
-		currentState: null,
-		/** Time that the state began */
-		stateStartTime: Date.now(),
-		/** Map from each state's id to the following state */
-		nextState: {},
 		/** All movers */
 		movers: movers.movers,
 		/** Function which states can call to transition to the next state */
@@ -92,7 +87,19 @@ function animate(config) {
 		/** Set new colors */
 		setColors: setColors,
 		/** Set new colors */
-		resetColors: movers.resetColors
+		resetColors: movers.resetColors,
+		
+		/** Current state */
+		currentState: null,
+		/** Time that the state began */
+		stateStartTime: Date.now(),
+		/** Map from each state's id to the following state */
+		nextState: {},
+		
+		/** Timeout id for transitioning to the next state */
+		stateTimeoutId: null,
+		/** Animation frame request id for updating movers and states */
+		animationFrameRequestId: null,
 	};
 	
 	config = _.extend(defaultConfig, config);
@@ -112,14 +119,15 @@ function animate(config) {
 
 			canvas.width = config.width;
 			canvas.height = config.height;
+            
+            // Resize the canvas to scale
+			animationState.canvasW = canvas.offsetWidth / config.scale;
+			animationState.canvasH = canvas.offsetHeight / config.scale;
 			
+			// Register mouse blowback listeners
 			if (config.blowEnabled) {
 				config.blower = blower.getDefaultBlower(canvas, config.scale)
 			}
-            
-            // Resize the canvas to the scale
-			animationState.canvasW = canvas.offsetWidth / config.scale;
-			animationState.canvasH = canvas.offsetHeight / config.scale;
  
 			// Initialize states
 			animationState.nextState = states.createTransitionMap(config.states, config.repeat);
@@ -127,13 +135,17 @@ function animate(config) {
 			// Initialize the renderer
 			config.renderer = render.getRenderer(config.renderer, canvas);
 
+			// Set initial colors
 			setColors(colors.blueColors);
 			
 			// Initialize the movers
 			movers.initialize(animationState, config.renderer.numMovers);
 			
+			// Go to the first state
+			goToState(config.states[0]);
+			
 			// Register the animation frame requests
-			initFrameRequest();
+			initAnimationFrameRequests();
 			
 			if (config.initCallback) {
 				config.initCallback(goToState);
@@ -145,17 +157,15 @@ function animate(config) {
 	}
 	
 	/** Initialize the frame requests */
-	function initFrameRequest() {
+	function initAnimationFrameRequests() {
 		animator.register("updateMovers", () => {
 			movers.updatePosition(animationState, config.blower);
 			config.renderer.render(movers.movers);
 		}, 33);
+		
 		animator.register("updateState", updateState, 100);
-
-		// Go to the first state
-		goToState(config.states[0]);
-
-		animator.animate();
+		
+		animator.start();
 	}
 	
 	function setColors(baseColors) {
@@ -210,14 +220,8 @@ function animate(config) {
 	}
 
 	function updateState() {
-		if (animationState.stopCallback) {
-			config.domElement.removeChild(config.canvas);
-			return;
-		}
-		
 		animationState.updateDelta = Date.now() - animationState.stateStartTime;
 		animationState.updateCount = animationState.updateDelta / 100 - 6;
-//		console.log(updateCount + " " + (updateDelta / 100));
 		if (!animationState.currentState) {
 			return;
 		}
@@ -226,8 +230,15 @@ function animate(config) {
 		}
 	}
 	
-	function stop(stopCallback) {
-		animationState.stopCallback = stopCallback || Function.prototype;
+	function stop() {
+		// Stop requesting animation frames (updating movers and states)
+		animator.stop();
+		
+		// Stop transitioning states
+		clearTimeout(animationState.stateTimeoutId);
+		
+		// Remove the created canvas
+		config.domElement.removeChild(config.canvas);
 	}
 		
 	return {
