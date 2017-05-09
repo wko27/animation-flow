@@ -446,8 +446,6 @@ function goDisplayScrollingText(pixelLoader, textScroller) {
 }
 
 /**
- * @param id					Id to manipulate text displayed
- * @param highlightId			Id of the clickable button to highlight
  * @param init					Function to initialize the state
  *	In general, this will be null if you want the Movers to be static at the end of the previous state
  * @param update				Function to update the state
@@ -455,23 +453,25 @@ function goDisplayScrollingText(pixelLoader, textScroller) {
  * @param destroy				Function to destroy the state
  * @param transitionDelay		Time in milliseconds before transitioning to the next state (pass in null to avoid timeout-based state transitions)
  */
-var State = function(id, highlightId,
-					init, update, destroy,
-					transitionDelay) {
-	this.id = id;
-	this.highlightId = highlightId;
-	this.init = init || Function.prototype;
-	this.update = update || Function.prototype;
-	this.destroy = destroy || Function.prototype;
-	this.transitionDelay = transitionDelay;
-	if (!State.initialState) {
-		State.initialState = this;
+class State {
+	constructor(init, update, destroy, transitionDelay, preInit, postDestroy) {
+		this.id = State.count ++;
+		this.preInit = Function.prototype;
+		this.init = init || Function.prototype;
+		this.update = update || Function.prototype;
+		this.destroy = destroy || Function.prototype;
+		this.postDestroy = Function.prototype;
+		this.transitionDelay = transitionDelay;
+		if (!State.initialState) {
+			State.initialState = this;
+		}
 	}
-};
+}
+State.count = 0;
 
 // Randomize data points
-function scatter() {		
-	return new State('init', null,
+function scatter() {
+	return new State(
 				explode, slowDown, null,
 				2000
 			);
@@ -479,7 +479,7 @@ function scatter() {
 
 // Gather into Medallia logo
 function nestedDiamonds() {
-	return new State('collect', 'collect',
+	return new State(
 				null, goCollectData, null,
  				6000
 			);
@@ -487,7 +487,7 @@ function nestedDiamonds() {
 
 // Four spinning circles
 function circles() {
-	return new State('analyze', 'analyze',
+	return new State(
 				null, goAnalyzeData, null,
 				6000
 			);
@@ -495,15 +495,15 @@ function circles() {
 		
 // Center circles combine to a figure eight
 function circlesFigureEight() {
-	return new State('clean', 'analyze',
+	return new State(
 				null, goFilterData, null,
 				6000
 			);
 }
 		
 // Form into visualizations (graphs, bar charts, etc)
-function display() {
-	return new State('display', 'display',
+function graphs() {
+	return new State(
 				null, goVisualizeData, null,
 				12000
 			);
@@ -512,7 +512,7 @@ function display() {
 // Display the static text
 function staticText(msg) {
 	const messagePixelLoader = pixelLoader.registerText(msg, 30, 75 * msg.length, 100);
-	return new State('medallia', null,
+	return new State(
 				goDisplayPixels(messagePixelLoader, true), null, null,
 				8000
 			);
@@ -524,7 +524,7 @@ function scrollingText(msg) {
 		throw new Error("No message provided!");
 	}
 	const messagePixelLoader = pixelLoader.registerText(msg, 30, 300 * msg.length / 8, 75);
-	return new State('message', null,
+	return new State(
 				null, goDisplayScrollingText(messagePixelLoader), null,
 				null
 			);
@@ -540,7 +540,7 @@ function image(img, onload) {
 	var imagePixelLoader = pixelLoader.registerImage(img, 300, 300);
 	
 	// Display a static image
-	return new State('image', null,
+	return new State(
 				(animationState) => {
 					animationState.setColors(colors.greenColors);
 					goDisplayPixels(imagePixelLoader, false)(animationState);
@@ -572,7 +572,7 @@ const examples = {
 	nestedDiamonds: nestedDiamonds,
 	circles: circles,
 	circlesFigureEight: circlesFigureEight,
-	display: display,
+	graphs: graphs,
 	image: image,
 	scrollingText: scrollingText,
 	staticText: staticText

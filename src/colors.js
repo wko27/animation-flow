@@ -46,7 +46,7 @@ function generateLumVariation(hex, lum) {
 	var rgb = [];
 	var c, i;
 	for (i = 0; i < 3; i++) {
-		c = parseInt(hex.substr(i*2,2), 16);
+		c = parseInt(hex.substr(i * 2, 2), 16);
 		rgb.push(Math.round(Math.min(Math.max(0, c + (c * lum)), 255)));
 	}
 	return rgb;

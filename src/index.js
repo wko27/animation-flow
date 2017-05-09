@@ -3,14 +3,44 @@ var blower = require('./util/blower');
 var $ = require('jquery');
 
 function medallia(domElement, width, height) {
-  $(function() {
+  const transitionHighlights = {
+    collect: "collect",
+    analyze: "analyze",
+    clean: "analyze",
+    display: "display"
+  };
+  
+  function fadeOut(trigger) {
+    // Fade out the last explanation, and unhighlight the appropriate control
+    $('#' + trigger + '-explanation').fadeOut(100);
+    $('#' + trigger + '-control').removeClass("viz-control-active");
+  }
 
-	const transitionHighlights = {
-		collect : "collect",
-		analyze : "analyze",
-		clean : "analyze",
-		display : "display"
-	};
+  function fadeIn(trigger) {
+    // Fade in the new explanation, and highlight the appropriate control
+    $('#' + trigger + '-explanation').animate('opacity',150).fadeIn(500);
+    $('#' + trigger + '-control').addClass("viz-control-active");
+  }				
+
+  $(function() {	
+	const triggerStates = {
+		'collect': viz.examples.nestedDiamonds(),
+		'analyze': viz.examples.circles(),
+		'display': viz.examples.graphs()
+	}
+	
+	for (var trigger in triggerStates) {
+		if (!triggerStates.hasOwnProperty(trigger)) {
+			continue;
+		}
+		var state = triggerStates[trigger];
+		state.preInit = ((trigger) => {
+			return () => fadeIn(trigger);
+		})(trigger);
+		state.postDestroy = ((trigger) => {
+			return () => fadeOut(trigger);
+		})(trigger);
+	}
 	
 	// Register the image if desired
 	const image = new Image();
@@ -22,10 +52,10 @@ function medallia(domElement, width, height) {
 			height: height,
 			states: [
 				viz.examples.scatter(),
-				viz.examples.nestedDiamonds(),
-				viz.examples.circles(),
+				triggerStates['collect'],
+				triggerStates['analyze'],
 				viz.examples.circlesFigureEight(),
-				viz.examples.display(),
+				triggerStates['display'],
 				viz.examples.staticText("MEDALLIA"),
 				viz.examples.image(image)
 			],
@@ -34,22 +64,9 @@ function medallia(domElement, width, height) {
 				// Register visualization controls
 				$('.viz-control').bind('click', function(){
 					var id = $(this).attr('id').split('-')[0];
-					goToState(id);
+					var state = triggerStates[id];
+					goToState(state);
 				});
-			},
-			transitionOutCallback: function(oldStateId) {
-				if (oldStateId in transitionHighlights) {
-					// Fade out the last explanation, and unhighlight the appropriate control
-					$('#' + oldStateId + '-explanation').fadeOut(100);
-					$('#' + transitionHighlights[oldStateId] + '-control').removeClass("viz-control-active");
-				}
-			},
-			transitionInCallback: function(newStateId) {
-				if (newStateId in transitionHighlights) {
-					// Fade in the new explanation, and highlight the appropriate control
-					$('#' + newStateId + '-explanation').animate('opacity',150).fadeIn(500);
-					$('#' + transitionHighlights[newStateId] + '-control').addClass("viz-control-active");
-				}
 			},
 			blowEnabled: true
 		});
@@ -64,9 +81,9 @@ function message(domElement, width, height, messageText) {
       domElement: domElement,
       width: width,
       height: height,
-      states : [viz.examples.scrollingText(messageText)],
-      repeat : true,
-      blowEnabled : true,
+      states: [viz.examples.scrollingText(messageText)],
+      repeat: true,
+      blowEnabled: true,
     });
     
     animation.start();

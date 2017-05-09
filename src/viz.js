@@ -39,18 +39,6 @@ const defaultConfig = {
 	initCallback: null,
 	
 	/**
-	 * Callback function to be called before a state is initialized
-	 * The state id is passed as the sole parameter
-	 */
-	transitionInCallback: Function.prototype,
-	
-	/**
-	 * Callback function to be called after a state is destroyed
-	 * The state id is passed as the sole parameter
-	 */
-	transitionOutCallback: Function.prototype,
-	
-	/**
 	 * Renderer responsible for rendering the Mover objects
 	 * By default, we will try using webGL, and fall back to HTML5 canvas if not supported
 	 * To force, use either 'webgl', or 'canvas'
@@ -196,9 +184,7 @@ function animate(config) {
 		// Clean up from the last state, but only if there is a next state to go to
 		if (animationState.currentState) {
 			animationState.currentState.destroy(animationState);
-			
-			// Trigger callback for exiting old state
-			config.transitionOutCallback(animationState.currentState.id);
+			animationState.currentState.postDestroy(animationState);
 		}
 		
 		// Reset the update count for the new state
@@ -207,10 +193,8 @@ function animate(config) {
 		// Set the new state
 		animationState.currentState = state;
 		
-		// Trigger callback for entering new state
-		config.transitionInCallback(animationState.currentState.id);
-		
 		// Initialize the new state
+		animationState.currentState.preInit(animationState);
 		animationState.currentState.init(animationState);
 		
 		// Set up the next state transition

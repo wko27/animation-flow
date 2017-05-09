@@ -3,7 +3,7 @@ const colors = require("./colors");
 const movers = [];
 
 function Mover() {
-	this.count = ++Mover.count;
+	this.count = Mover.count ++;
 	this.type1 = this.count % Mover.numType1Types;
 	this.type2 = this.count % Mover.numType2Types;
 
