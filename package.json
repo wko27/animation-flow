@@ -5,10 +5,10 @@
   "main": "src/viz.js",
   "scripts": {
     "build": "npm run clean && mkdir -p dist && browserify src/index.js --standalone viz -o dist/main.js",
-    "watch": "npm run clean && mkdir -p dist && watchify src/index.js --standalone viz -o dist/main.js",
     "clean": "rm -rf dist",
+    "prepublish": "npm run build",
     "start": "nodemon server/index.js",
-    "prepublish": "npm run build"
+    "watch": "npm run clean && mkdir -p dist && watchify src/index.js --standalone viz -o dist/main.js"
   },
   "repository": {
     "type": "git",
